@@ -1,0 +1,67 @@
+<!-- 附录 -->
+<section class="mod" id="appx">
+<h2><span class="no">附</span>附录：数据来源、缺口清单、搜索排名与方法</h2>
+
+<h3>A. 数据采集方法</h3>
+<div class="tw"><table>
+<tr><th>轮次</th><th>采集日期</th><th>市场</th><th>内容</th><th>用量</th></tr>
+<tr><td>美国第一轮</td><td>2026-11-12</td><td>美国</td><td>行业报告、搜索排名与 Shopping、竞品官网、新闻、Trends（含品牌词）</td><td>Serper 6 次、Tavily 11 次、Firecrawl 5 积分</td></tr>
+<tr><td>美国第二轮</td><td>2026-11-13</td><td>美国</td><td>Census HS 8501 进口额；Reddit、YouTube；Meta / LinkedIn 广告库</td><td>Apify $0.35、Census 1 次</td></tr>
+<tr><td>北美</td><td>2026-11-16</td><td>美国、加拿大、墨西哥</td><td>北美规模报告、Census HS 850152、Shopping 价格、搜索排名、关税与近岸外包新闻、CSA 认证、Trends</td><td>Serper 4 次、Tavily 3 次</td></tr>
+<tr><td>欧洲 + 中东</td><td>2026-11-16</td><td>德国、阿联酋、沙特</td><td>欧洲 / 中东规模报告、VDMA / ZVEI、欧盟机械法规、SASO / ECAS、搜索排名、Shopping、LinkedIn 与 Meta 广告库（含 5 个德国竞品）、德语新闻、Trends、YouTube</td><td>Serper 8 次、Tavily 9 次、Apify $0.06</td></tr>
+<tr><td>东南亚</td><td>2026-11-16</td><td>越南、泰国、印尼</td><td>东南亚规模报告、本地语言搜索排名、Meta 广告库、FDI 与本地含量新闻、SNI / BOI、Meta 广告成本基准、Trends、YouTube</td><td>Serper 6 次、Tavily 4 次、Apify $0.11</td></tr>
+<tr><td>美国第三轮（步进）</td><td>2026-11-20</td><td>美国</td><td>步进 / 闭环步进市场报告、步进词搜索排名与 Shopping、StepperOnline 官网、Trends、LinkedIn 广告库（Oriental、Leadshine、Lin Engineering、Applied Motion）、Reddit</td><td>Serper 6 次、Tavily 3 次、Apify $0.18、Firecrawl 3 积分</td></tr>
+<tr><td>四区域补充（步进）</td><td>2026-11-20</td><td>墨、德、阿联酋、越、泰、印尼</td><td>各国步进词 Google Trends 7 组；LinkedIn 广告库“Schrittmotor”（德国，0 条）</td><td>只用免费渠道，0 费用</td></tr>
+<tr><td>日韩两轮（步进）</td><td>2026-11-20</td><td>日本、韩国</td><td>市场报告、产业与政策新闻、搜索排名与 Shopping、展会资料、Naver 份额、Trends</td><td>见 research/jpkr/*/usage.json</td></tr>
+<tr><td>解决方案版补抓</td><td>2026-11-22</td><td>美、德、越、泰、印尼、阿联酋、沙特、土耳其、伊朗、日、韩</td><td>无刷 / 永磁 / 轴向磁通 / 机器人执行器 / 产品开发与代工的 Google Trends 17 组；无刷电机、轴向磁通、人形机器人关节、硬件创业与众筹新闻 5 次（Google News）</td><td>只用免费渠道，0 费用</td></tr>
+<tr><td>公司资料与会议</td><td>2026-11-20 / 21</td><td>—</td><td>《海布里 2020》产品目录；2026-11-21 品牌出海讨论会转写稿与纪要；本项目已有的三份计划</td><td>—</td></tr>
+</table></div>
+<p class="small">工具：crawler 技能<b>高级查询</b>（Tavily 报告检索、Serper Google 搜索与 Shopping、Apify 社媒与 Meta 广告库、Firecrawl 渲染）+ 免费渠道（Google News RSS、Google Trends 网页接口、LinkedIn 广告库、U.S. Census 国际贸易 API）。原始数据保存在 <code>research/out_us_servo*/</code>、<code>research/out_us_stepper_v3/</code> 和 <code>research/global/out_{na,eu_me,sea,stepper_v3}/</code>、<code>research/jpkr/</code>、<code>research/solution_r1/</code>（raw、sources.json、gaps.json、failures.json、usage.json）。<br>
+<b>来源分层：</b><span class="lay layA">A 权威二手报告</span> <span class="lay layB">B 公开行为数据</span> <span class="lay layC">C 竞品公开数据</span> <span class="lay layD">D 公司资料</span>。市场研究公司的公开摘要有推销报告的立场，新闻标题和二手引用只作方向参考。前五轮按伺服、之后三轮按步进采集：环境、法规、渠道、广告成本类数据与品类关系不大，正文继续使用；需求与竞争数据以 2026-11-22 的解决方案版补抓为准，步进数据只在标明“步进参照”时使用。</p>
+
+<h3>B. 数据来源登记（共 {{N_SRC}} 条，正文引用 {{N_CITED}} 条）</h3>
+<p class="small muted">分层：A {{N_A}} · B {{N_B}} · C {{N_C}} · D {{N_D}}；区域：{{REGION_COUNTS}}。同一网址在多轮中出现时只保留一条，最后一列是各轮原始编号。点正文中的 D 编号可以跳到这里。</p>
+<div class="srcbar">
+  <select id="fRegion" aria-label="按区域筛选"><option value="">全部区域</option><option>北美</option><option>欧洲</option><option>中东</option><option>东南亚</option><option>日本</option><option>韩国</option><option>中国</option><option>全球</option></select>
+  <select id="fLayer" aria-label="按层级筛选"><option value="">全部层级</option><option value="A">A 权威二手</option><option value="B">B 公开行为</option><option value="C">C 竞品公开</option><option value="D">D 公司资料</option></select>
+  <label class="small"><input type="checkbox" id="fCited"> 只看正文引用</label>
+  <input id="fText" placeholder="搜索发布方或标题…" aria-label="搜索来源">
+  <span class="small muted" id="fCount"></span>
+</div>
+<div class="tw" id="srcTable"><table>
+<thead><tr><th>编号</th><th>层级</th><th>区域·国家</th><th>发布方</th><th>标题 / 链接</th><th>渠道</th><th>发布日期</th><th>抓取日期</th><th>问题</th><th>采集轮次</th></tr></thead>
+<tbody>
+{{SOURCE_ROWS}}
+</tbody></table></div>
+<p class="small muted">问题编号：Q1 市场规模、Q2 客户与动机、Q3 价格、Q4 竞品、Q5 渠道与广告、Q6 季节与展会、Q7 顾虑与风险、Q8 法规、X 公司内部数据。</p>
+
+<h3>C. 缺口清单与建议去向</h3>
+<div class="tw"><table>
+<tr><th>#</th><th>缺口</th><th>原因（已搜过哪些渠道）</th><th>建议去向</th></tr>
+<tr><td>G1</td><td>公司能力与报价基准：工程师人数、可同时承接的项目数、已完成定制项目的开发费与批量金额、开发费报价表</td><td>内部数据</td><td>曹博提供；用来替换 7.6 的开发费、转化率、批量额参数</td></tr>
+<tr><td>G2</td><td>小批量海外物流与到岸成本</td><td>待询价</td><td>待办 1：顺丰、跨越速运报价，运费与报关、仓储费用分开核算</td></tr>
+<tr><td>G3</td><td>无刷 / 永磁 / 轴向磁通 / 机器人电机的分区域市场规模</td><td>免费新闻只拿到标题（MarketsandMarkets 等），原文被验证页拦截</td><td>高级查询（Tavily 报告检索）或购买报告摘要</td></tr>
+<tr><td>G4</td><td>创客与定制开发需求的量化：众筹平台含运动部件的硬件项目数、Indiegogo / Makuake / Wadiz 规模、Upwork 等平台的硬件开发需求</td><td>本轮只用了免费渠道</td><td>高级查询：各平台搜索排名与项目列表（约 10 次 Serper），或人工抽样 100 个众筹项目</td></tr>
+<tr><td>G5</td><td>搜索绝对量</td><td>Google Trends 是组内相对指数（0–100），不是次数</td><td>开户后用 Keyword Planner（Google）、Naver 关键词工具、Yahoo! JAPAN 关键词工具导出</td></tr>
+<tr><td>G6</td><td>中东线下需求（土耳其、约旦）</td><td>约旦 Trends 无数据；土耳其只查了英文和一个土耳其语词；伊朗因制裁不再调查</td><td>土耳其语搜索排名与代理名单（高级查询）；向土耳其行业协会、展会了解线下渠道</td></tr>
+<tr><td>G7</td><td>竞争对手的报价与服务模式（中国代工 / 设计公司、海外设计公司）</td><td>只找到 Morpho 的宣传稿</td><td>人工调研 5–8 家，记录报价方式、周期、知识产权条款</td></tr>
+<tr><td>G8</td><td>美国、欧洲适合的展会（硬件 / 机器人 / 创客）及费用</td><td>未查</td><td>候选清单与报价（高级查询或直接联系主办方）</td></tr>
+<tr><td>G9</td><td>案例素材与客户授权</td><td>素材在公司内部，授权未确认</td><td>待办 3；逐个客户确认能否公开、是否匿名</td></tr>
+<tr><td>G10</td><td>出口管制与制裁合规</td><td>需要专业意见</td><td>外贸合规顾问或律师：两用物项清单、客户与最终用途审核流程</td></tr>
+<tr><td>G11</td><td>年度营销预算口径</td><td>本计划沿用四区域版 ¥1 万；日韩计划为 $10 万</td><td>公司确认后修改右上角预算</td></tr>
+<tr><td>G12</td><td>对标的中国线上品牌的身份与数据</td><td>会上说是杭州公司，未核实；成交量无公开数据</td><td>核实公司主体；会上提到的价格数字是口头的，正式使用前复核</td></tr>
+</table></div>
+<p class="small muted">完整的覆盖检查见各轮目录下的 coverage.json、gaps.json 和 failures.json。</p>
+
+<h3>D. 各国 Google 搜索前 10 名（竞品与分销商候选）</h3>
+<div class="tw"><table>
+<tr><th>国家</th><th>检索词</th><th>前 10 名域名</th></tr>
+{{SERP_ROWS}}
+</table></div>
+<p class="small muted">来源：Serper（Google 搜索 API）。这些是步进 / 伺服词的排名，按新定位只用来找东南亚、中东的代理候选和美国的同行参照；解决方案类关键词的排名还没有抓（缺口 G4）。已排除维基百科和 YouTube。</p>
+
+<h3>E. 方法论依据</h3>
+<p class="small">科特勒、凯勒、切尔内夫《营销管理》G-STIC 与 7T；切尔内夫 5C；Webster &amp; Wind（1972）组织购买行为；Robinson, Faris &amp; Wind（1967）购买类型；Bonoma &amp; Shapiro（1983）嵌套细分；Anderson, Narus &amp; van Rossum（2006）B2B 客户价值主张；Marn &amp; Rosiello（1992）价格瀑布；Parasuraman 等（1988）SERVQUAL；Keller CBBE；Johanson &amp; Vahlne（1977）乌普萨拉模型；Levitt（1983）全球化；Schooler（1965）原产地效应；Binet &amp; Field（2013）；Ries（2011）精益创业；Denzin（1978）三角验证；目标任务预算法。</p>
+</section>
+</main>
+<footer>海布里电气（SEAWERY）出海 B2B 年度营销计划 · 解决方案版 · 北美 / 欧洲 / 东南亚 / 中东 / 日本 / 韩国 · 依据《数字营销方法论 v6》与 2026-11-21 会议纪要 · 数据采集 2026-11-12 至 2026-11-22 · 金额默认人民币 · 标注【假设】的数字需要用公司数据和测试结果验证</footer>

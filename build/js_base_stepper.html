@@ -1,0 +1,220 @@
+<script>
+"use strict";
+const CHART = {{CHART_DATA}};
+/* ================= 预算模型 ================= */
+const DEFAULT_TOTAL = 10000;
+const MONTHS = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+const REG = {NA:{n:"北美",c:"#0b5cff"},EU:{n:"欧洲",c:"#7c4dff"},ME:{n:"中东",c:"#e8590c"},SEA:{n:"东南亚",c:"#00a99d"},FLEX:{n:"机动（按测试结果分配）",c:"#868e96"}};
+// key, 名称, 内容, 默认权重, 自动启用门槛(总预算¥), 区域分配, 月度节奏, 获客方式
+const ITEMS = [
+ {k:"web",n:"多语言官网与技术内容",d:"EN/ES/VI/TH 官网（Cloudflare 免费托管）、域名、翻译校对、NEMA 对照与选型页、开环 vs 闭环对比视频素材",w:30,min:0,reg:{SEA:.35,NA:.35,ME:.1,EU:.2},mo:[25,20,10,5,5,5,5,5,5,5,5,5]},
+ {k:"tools",n:"B2B 目录与工具",d:"wlw.de / DirectIndustry / IndoTrading 等资料页、CRM 免费版、SEO 工具月费",w:8,min:0,reg:{SEA:.3,NA:.3,ME:.2,EU:.2},mo:[30,10,10,5,5,5,5,5,5,10,5,5]},
+ {k:"samples",n:"样机与演示套件",d:"A 级客户、分销商和零售商的闭环套装样机国际快递、开环 vs 闭环演示箱、线缆配件（电机本身按公司库存计）",w:20,min:0,reg:{SEA:.45,NA:.3,ME:.15,EU:.1},mo:[0,5,10,10,10,10,10,10,10,10,10,5]},
+ {k:"google",n:"Google 搜索广告",d:"闭环步进、NEMA、EtherCAT 步进驱动长尾词精确匹配：美国、越南、墨西哥",w:18,min:0,reg:{NA:.65,SEA:.35},mo:[0,0,8,8,8,10,10,10,10,10,14,12]},
+ {k:"meta",n:"Meta 线索广告",d:"越南语、泰语、印尼语线索表单，按工业区地理定向；素材为丢步对比视频",w:17,min:0,reg:{SEA:1},mo:[0,0,10,10,8,10,10,10,8,10,12,12]},
+ {k:"reserve",n:"机动金",d:"Q3 起投给边际 CPL 最低、已验证的渠道",w:7,min:20000,reg:{FLEX:1},mo:[0,0,0,0,0,0,25,25,25,25,0,0]},
+ {k:"linkedin",n:"LinkedIn 广告",d:"分销商与 CNC 零售商招募、A 级账户定向投放：中东、德国、美国",w:12,min:30000,reg:{ME:.4,EU:.3,NA:.3},mo:[0,0,0,10,10,10,10,10,15,15,10,10]},
+ {k:"amazon",n:"Amazon 上架测试",d:"Amazon.com / .de 上架闭环 NEMA 23 套装与 MS-Mini3E（H9），含 FBA 首批费用；商标注册后开 Brand Registry",w:6,min:30000,reg:{EU:.5,NA:.5},mo:[0,0,0,20,10,10,10,10,10,10,10,10]},
+ {k:"show",n:"展会",d:"",w:35,min:15000,reg:{SEA:.6,ME:.4},mo:[0,0,0,0,0,40,0,30,0,0,30,0]},
+ {k:"agent",n:"本地兼职 BD / 代理佣金",d:"越南、迪拜各 1 名兼职业务拓展，按月固定 + 成交佣金",w:20,min:100000,reg:{SEA:.5,ME:.5},mo:[0,0,0,0,0,0,16,16,17,17,17,17]}
+];
+const PARAMS = [
+ {k:"fx",n:"汇率（人民币 / 美元）",v:7.2,step:.1,u:""},
+ {k:"cplG",n:"Google 每条询盘成本",v:50,step:5,u:"$"},
+ {k:"cplM",n:"Meta 每条询盘成本（东南亚）",v:15,step:1,u:"$"},
+ {k:"cplL",n:"LinkedIn 每条询盘成本",v:150,step:10,u:"$"},
+ {k:"cplS",n:"展会每条有效线索成本",v:120,step:10,u:"$"},
+ {k:"cplA",n:"本地 BD 每条询盘成本",v:100,step:10,u:"$"},
+ {k:"cplZ",n:"Amazon 每个 B 端询盘 / 订单成本",v:60,step:10,u:"$"},
+ {k:"webCpl",n:"官网内容每条自然询盘成本",v:400,step:50,u:"¥"},
+ {k:"organic",n:"外联与自然询盘（人力，不占预算）",v:40,step:5,u:"条"},
+ {k:"sqlRate",n:"询盘 → SQL",v:25,step:1,u:"%"},
+ {k:"sampleRate",n:"SQL → 样机",v:40,step:1,u:"%"},
+ {k:"winRate",n:"样机 → 成交",v:35,step:1,u:"%"},
+ {k:"aov",n:"新客户首年采购额",v:6000,step:200,u:"$"},
+ {k:"margin",n:"毛利率",v:30,step:1,u:"%"}
+];
+const TIERS = [
+ {t:0,n:"¥1 万 · 验证",d:"官网与内容、B2B 目录、样机、小额 Google（美/越）与 Meta（越/泰）；获客主要靠创始人内容和外联"},
+ {t:20000,n:"¥2–3 万 · 加测",d:"+ 机动金；≥¥3 万再加 LinkedIn（中东分销商招募）和 Amazon 上架测试"},
+ {t:100000,n:"¥10 万 · 落地",d:"+ 曼谷 / 河内 / 迪拜观展拜访；越南、迪拜兼职 BD；增量测试"},
+ {t:300000,n:"¥30 万 · 展位",d:"展会预算 ≥ ¥6 万时换成东南亚标准展位（可申请商会组团补贴）"},
+ {t:1000000,n:"¥100 万+ · 正式进入",d:"四区常年投放、展位、本地代理；接近目标任务法测算的 ¥120–150 万"}
+];
+const LS = "global-stepper-plan-v1";
+let S = {total:DEFAULT_TOTAL, w:{}, mode:{}, p:{}};
+ITEMS.forEach(i=>{S.w[i.k]=i.w; S.mode[i.k]="auto";});
+PARAMS.forEach(p=>S.p[p.k]=p.v);
+try{const s=JSON.parse(localStorage.getItem(LS)||"null"); if(s){Object.assign(S.w,s.w||{});Object.assign(S.mode,s.mode||{});Object.assign(S.p,s.p||{}); if(typeof s.total==="number")S.total=s.total;}}catch(e){}
+const qb = new URLSearchParams(location.search).get("budget"); if(qb && !isNaN(+qb)) S.total = Math.max(0, +qb);
+const save = ()=>{try{localStorage.setItem(LS, JSON.stringify(S));}catch(e){}};
+
+const cny = v=>"¥"+Math.round(v).toLocaleString("en-US");
+const usd = v=>"$"+Math.round(v).toLocaleString("en-US");
+const num = v=> v<10 ? (Math.round(v*10)/10).toString() : Math.round(v).toLocaleString("en-US");
+const pct = v=>Math.round(v)+"%";
+
+function enabled(i){ const m=S.mode[i.k]; return m==="on" || (m==="auto" && S.total>=i.min); }
+function compute(){
+  const on = ITEMS.filter(enabled), ws = on.reduce((a,i)=>a+(+S.w[i.k]||0),0);
+  const amt = {}; ITEMS.forEach(i=>amt[i.k]=0);
+  if(ws>0) on.forEach(i=>amt[i.k]=S.total*(+S.w[i.k]||0)/ws);
+  const P=S.p, fx=+P.fx||7.2, U=v=>v/fx;
+  const leads = {
+    google: U(amt.google)/P.cplG, meta: U(amt.meta)/P.cplM, linkedin: U(amt.linkedin)/P.cplL,
+    show: U(amt.show)/P.cplS, agent: U(amt.agent)/P.cplA, amazon: U(amt.amazon)/P.cplZ,
+    reserve: U(amt.reserve)/((P.cplG+P.cplM)/2), web: amt.web/P.webCpl, organic: +P.organic };
+  const L = Object.values(leads).reduce((a,b)=>a+(isFinite(b)?b:0),0);
+  const sql=L*P.sqlRate/100, samples=sql*P.sampleRate/100, wins=samples*P.winRate/100;
+  const revUSD=wins*P.aov, rev=revUSD*fx, gp=rev*P.margin/100;
+  const k = {leads:L, sql, samples, wins, revenue:rev, gp, cac: wins>0?S.total/wins:0,
+    ltv:P.aov*3*P.margin/100*fx, mer: S.total>0?rev/S.total:0, coverage:S.total/1350000*100};
+  k.ltvcac = k.cac>0 ? k.ltv/k.cac : 0;
+  const reg={}; Object.keys(REG).forEach(r=>reg[r]=0);
+  ITEMS.forEach(i=>Object.entries(i.reg).forEach(([r,f])=>reg[r]+=amt[i.k]*f));
+  return {amt, leads, k, reg, fx};
+}
+function showDesc(a){ return a>=60000 ? "东南亚标准展位（9 m²，含搭建与运输）+ 迪拜观展" : (a>0 ? "观展拜访：曼谷 Manufacturing Expo、河内 VME、迪拜（差旅、门票、资料）" : "观展拜访或标准展位（预算 ≥ ¥1.5 万时启用）"); }
+
+function render(){
+  const R=compute(), k=R.k;
+  const set=(key,txt)=>document.querySelectorAll('[data-m="'+key+'"]').forEach(e=>e.textContent=txt);
+  set("total",cny(S.total)); set("totalUSD",usd(S.total/R.fx));
+  document.getElementById("heroBudget").textContent=cny(S.total);
+  ["bTop","bInput"].forEach(id=>{const e=document.getElementById(id); if(document.activeElement!==e) e.value=S.total;});
+  document.getElementById("bRange").value = S.total<=5000?0:Math.min(1000,Math.round(Math.log(S.total/5000)/Math.log(400)*1000));
+  ITEMS.forEach(i=>set("item:"+i.k, enabled(i)&&R.amt[i.k]>0 ? cny(R.amt[i.k]) : (S.total<=0||S.total>=i.min ? "未分配" : "未启用（≥ "+cny(i.min)+"）")));
+  set("kpi:leads",num(k.leads)); set("kpi:sql",num(k.sql)); set("kpi:samples",num(k.samples)); set("kpi:wins",num(k.wins));
+  set("kpi:revenue",cny(k.revenue)); set("kpi:gp",cny(k.gp)); set("kpi:cac",cny(k.cac)); set("kpi:ltv",cny(k.ltv));
+  set("kpi:ltvcac",(Math.round(k.ltvcac*10)/10)+""); set("kpi:mer",(Math.round(k.mer*10)/10)+"×"); set("kpi:coverage",(k.coverage<1?(Math.round(k.coverage*10)/10):Math.round(k.coverage))+"%");
+  set("p:margin",pct(S.p.margin)); set("p:fx",S.p.fx+""); set("p:sqlRate",pct(S.p.sqlRate)); set("p:sampleRate",pct(S.p.sampleRate));
+  set("p:winRate",pct(S.p.winRate)); set("p:cplG","$"+S.p.cplG); set("p:aov",usd(S.p.aov));
+  // 预算阶梯
+  const tb=document.getElementById("tiers"); tb.innerHTML="";
+  let cur=0; TIERS.forEach((t,i)=>{if(S.total>=t.t)cur=i;});
+  TIERS.forEach((t,i)=>{const d=document.createElement("div"); if(i===cur)d.className="cur";
+    const b=document.createElement("b"); b.textContent=(i===cur?"▶ ":"")+t.n; d.appendChild(b); d.appendChild(document.createTextNode(t.d)); tb.appendChild(d);});
+  // 明细表
+  const tbody=document.querySelector("#itemTable tbody"); tbody.innerHTML="";
+  const regTxt=r=>Object.entries(r).map(([a,f])=>REG[a].n.replace(/（.*/,"")+(f<1?" "+Math.round(f*100)+"%":"")).join("、");
+  ITEMS.forEach(i=>{
+    const on=enabled(i), a=R.amt[i.k], tr=document.createElement("tr"); if(!on)tr.className="off";
+    const desc = i.k==="show"?showDesc(a):i.d;
+    const status = S.mode[i.k]==="auto" ? (on?'<span class="st on">自动启用</span>':'<span class="st off">≥ '+cny(i.min)+' 启用</span>') : (S.mode[i.k]==="on"?'<span class="st force">手动启用</span>':'<span class="st off">手动关闭</span>');
+    tr.innerHTML='<td><b></b></td><td class="small"></td><td class="nw"><select aria-label="启用方式"><option value="auto">自动</option><option value="on">启用</option><option value="off">关闭</option></select><br>'+status+'</td>'+
+      '<td class="nw"><input type="range" min="0" max="60" step="1" aria-label="权重"> <span class="small"></span></td>'+
+      '<td class="r">'+(S.total>0?(a/S.total*100).toFixed(1):"0.0")+'%</td><td class="r m">'+cny(a)+'</td><td class="r small">'+usd(a/R.fx)+'</td><td class="small"></td>';
+    tr.querySelector("b").textContent=i.n; tr.children[1].textContent=desc; tr.children[7].textContent=regTxt(i.reg);
+    const sel=tr.querySelector("select"); sel.value=S.mode[i.k]; sel.onchange=()=>{S.mode[i.k]=sel.value; save(); render();};
+    const rg=tr.querySelector("input"), lab=tr.querySelector("td:nth-child(4) span"); rg.value=S.w[i.k]; lab.textContent=S.w[i.k];
+    rg.oninput=()=>{S.w[i.k]=+rg.value; save(); render();};
+    tbody.appendChild(tr);
+  });
+  // 区域
+  const rt=document.querySelector("#regionTable tbody"); rt.innerHTML="";
+  const use={NA:"美国 Google、选型页 SEO、样机、Amazon.com、CNC 零售商",EU:"德语资料、B2B 目录、LinkedIn、Amazon.de",ME:"LinkedIn 分销商招募、迪拜观展、兼职 BD、随中国整机出口",SEA:"Meta、越南 Google、样机、曼谷 / 河内展会、兼职 BD",FLEX:"Q3 按测试结果分配"};
+  Object.entries(R.reg).forEach(([r,v])=>{const tr=document.createElement("tr");
+    tr.innerHTML='<td><span class="pill" style="color:'+REG[r].c+'">'+REG[r].n+'</span></td><td class="r m">'+cny(v)+'</td><td class="r">'+(S.total>0?(v/S.total*100).toFixed(1):0)+'%</td><td class="small"></td>';
+    tr.children[3].textContent=use[r]; rt.appendChild(tr);});
+  drawRegion(R.reg);
+  // 月度排期
+  const gt=document.getElementById("ganttTable"); gt.innerHTML="";
+  const head=document.createElement("tr"); head.innerHTML="<th>科目</th>"+MONTHS.map(m=>"<th class='c'>"+m+"</th>").join("")+"<th class='r'>合计</th>"; gt.appendChild(head);
+  const mt=new Array(12).fill(0), maxCell=Math.max(1,...ITEMS.map(i=>{const s=i.mo.reduce((a,b)=>a+b,0);return Math.max(...i.mo.map(x=>R.amt[i.k]*x/s));}));
+  ITEMS.filter(i=>R.amt[i.k]>0).forEach(i=>{const s=i.mo.reduce((a,b)=>a+b,0), tr=document.createElement("tr");
+    const td0=document.createElement("td"); td0.className="lab"; td0.textContent=i.n; tr.appendChild(td0);
+    i.mo.forEach((x,m)=>{const v=R.amt[i.k]*x/s; mt[m]+=v; const td=document.createElement("td");
+      if(v>0){const al=.15+.85*v/maxCell; td.innerHTML='<div class="cell" style="background:rgba(11,92,255,'+al.toFixed(2)+')"></div><span class="small">'+(v>=1000?(v/1000).toFixed(1)+"k":Math.round(v))+'</span>';}
+      tr.appendChild(td);});
+    const tdt=document.createElement("td"); tdt.className="r m"; tdt.textContent=cny(R.amt[i.k]); tr.appendChild(tdt); gt.appendChild(tr);});
+  const ft=document.createElement("tr"); ft.style.fontWeight="700"; ft.style.background="#f5f8ff";
+  ft.innerHTML="<td class='lab'>月度合计</td>"+mt.map(v=>"<td>"+(v>=1000?(v/1000).toFixed(1)+"k":Math.round(v))+"</td>").join("")+"<td class='r'>"+cny(S.total)+"</td>"; gt.appendChild(ft);
+}
+function setTotal(v){ S.total=Math.max(0,Math.round(+v||0)); save(); render(); }
+["bTop","bInput"].forEach(id=>document.getElementById(id).addEventListener("input",e=>setTotal(e.target.value)));
+document.getElementById("bRange").addEventListener("input",e=>{const x=+e.target.value; setTotal(x===0?5000:Math.round(5000*Math.pow(400,x/1000)/1000)*1000);});
+document.querySelectorAll(".presets button[data-b]").forEach(b=>b.onclick=()=>setTotal(b.dataset.b));
+document.getElementById("bReset").onclick=()=>{S.total=DEFAULT_TOTAL; ITEMS.forEach(i=>{S.w[i.k]=i.w;S.mode[i.k]="auto";}); PARAMS.forEach(p=>S.p[p.k]=p.v); save(); buildParams(); render();};
+function buildParams(){ const box=document.getElementById("params"); box.innerHTML="";
+  PARAMS.forEach(p=>{const l=document.createElement("label"); const s=document.createElement("span"); s.textContent=p.n+(p.u?"（"+p.u+"）":"");
+    const inp=document.createElement("input"); inp.type="number"; inp.step=p.step; inp.min=0; inp.value=S.p[p.k]; inp.setAttribute("aria-label",p.n);
+    inp.oninput=()=>{const v=parseFloat(inp.value); if(!isNaN(v)&&v>0){S.p[p.k]=v; save(); render();}};
+    l.appendChild(s); l.appendChild(inp); box.appendChild(l);});
+  const n=document.createElement("div"); n.className="small muted"; n.style.gridColumn="1/-1";
+  n.textContent="询盘 = Σ 各科目金额 ÷ 对应 CPL + 官网内容金额 ÷ 内容 CPL + 外联与自然询盘；机动金按 Google 和 Meta 的平均 CPL 计算。"; box.appendChild(n);}
+
+/* ================= 图表（SVG） ================= */
+const NS="http://www.w3.org/2000/svg";
+function el(t,a,txt){const e=document.createElementNS(NS,t); for(const k in a)e.setAttribute(k,a[k]); if(txt!==undefined)e.textContent=txt; return e;}
+function svgBox(w,h){return el("svg",{viewBox:"0 0 "+w+" "+h,width:"100%",role:"img"});}
+const COLS=["#0b5cff","#ff7a1a","#00a99d","#7c4dff","#e64980"];
+const TRN={US:"美国",MX:"墨西哥",DE:"德国",AE:"阿联酋",SA:"沙特",VN:"越南",TH:"泰国",ID:"印尼"};
+let trCur="US";
+function drawTrends(){
+  const tabs=document.getElementById("trTabs"); tabs.innerHTML="";
+  Object.keys(CHART.trends).forEach(k=>{const b=document.createElement("button"); b.textContent=TRN[k]||k; if(k===trCur)b.className="on"; b.onclick=()=>{trCur=k;drawTrends();}; tabs.appendChild(b);});
+  const d=CHART.trends[trCur], W=1000,H=300,L=40,Rr=10,T=12,B=34, box=document.getElementById("trChart"); box.innerHTML="";
+  const svg=svgBox(W,H), n=d.labels.length, x=i=>L+(W-L-Rr)*i/(n-1), y=v=>T+(H-T-B)*(1-v/100);
+  [0,25,50,75,100].forEach(v=>{svg.appendChild(el("line",{x1:L,x2:W-Rr,y1:y(v),y2:y(v),stroke:"#e9edf5"})); svg.appendChild(el("text",{x:L-6,y:y(v)+4,"text-anchor":"end","font-size":11,fill:"#5d6b82"},v));});
+  d.labels.forEach((lab,i)=>{if(lab.endsWith("-01")) svg.appendChild(el("text",{x:x(i),y:H-12,"text-anchor":"middle","font-size":11,fill:"#5d6b82"},lab.slice(0,4)));});
+  d.series.forEach((s,j)=>{svg.appendChild(el("polyline",{points:s.map((v,i)=>x(i)+","+y(v)).join(" "),fill:"none",stroke:COLS[j%5],"stroke-width":2.2}));});
+  box.appendChild(svg);
+  const lg=document.getElementById("trLegend"); lg.innerHTML="";
+  d.terms.forEach((t,j)=>{const s=document.createElement("span"); const i=document.createElement("i"); i.style.background=COLS[j%5]; s.appendChild(i); s.appendChild(document.createTextNode(t)); lg.appendChild(s);});
+  const src=document.createElement("span"); src.textContent="Google Trends 月均（由周数据汇总），"+d.labels[0]+" → "+d.labels[d.labels.length-1]; lg.appendChild(src);
+}
+function drawTrade(){
+  const box=document.getElementById("tradeChart"); box.innerHTML="";
+  const W=1000,H=280, svg=svgBox(W,H); const panels=[["8501","HS 8501 全部电机与发电机"],["850110","HS 8501.10 ≤37.5 W 电机（小型步进多在此）"]];
+  panels.forEach(([hs,title],pi)=>{
+    const d=CHART.trade[hs]; if(!d) return;
+    const yrs={}; ["china","total"].forEach(c=>Object.entries(d[c]||{}).forEach(([ym,v])=>{const y=ym.slice(0,4); yrs[y]=yrs[y]||{china:0,total:0,m:0}; yrs[y][c]+=v; if(c==="china")yrs[y].m++;}));
+    const ys=Object.keys(yrs).sort(), ox=pi*500+20, w=460, base=230, mx=Math.max(...ys.map(y=>yrs[y].china));
+    svg.appendChild(el("text",{x:ox,y:18,"font-size":13,"font-weight":700,fill:"#18202f"},title));
+    ys.forEach((y,i)=>{const v=yrs[y].china, bw=w/ys.length*.55, bx=ox+i*w/ys.length+20, bh=(v/mx)*170;
+      svg.appendChild(el("rect",{x:bx,y:base-bh,width:bw,height:bh,rx:4,fill:"#0b5cff",opacity:.85}));
+      svg.appendChild(el("text",{x:bx+bw/2,y:base-bh-20,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"#18202f"},"$"+(v/1e8).toFixed(2)+" 亿"));
+      svg.appendChild(el("text",{x:bx+bw/2,y:base-bh-6,"text-anchor":"middle","font-size":11,fill:"#e8590c"},"占比 "+(v/yrs[y].total*100).toFixed(1)+"%"));
+      svg.appendChild(el("text",{x:bx+bw/2,y:base+16,"text-anchor":"middle","font-size":12,fill:"#5d6b82"},y+(yrs[y].m<12?"（1–"+yrs[y].m+"月）":"")));});
+  });
+  box.appendChild(svg);
+}
+let prCur="US";
+function drawPrice(){
+  const tabs=document.getElementById("prTabs"); tabs.innerHTML="";
+  [ ["US","美国（USD）· 步进"] ].forEach(([k,n])=>{const b=document.createElement("button"); b.textContent=n; if(k===prCur)b.className="on"; b.onclick=()=>{prCur=k;drawPrice();}; tabs.appendChild(b);});
+  const rows=(CHART.prices[prCur]||[]), cap=800, band=[150,200], sym="$";
+  const W=1000,H=200,L=30,Rr=30, x=v=>L+(W-L-Rr)*Math.min(v,cap)/cap, svg=svgBox(W,H), box=document.getElementById("priceChart"); box.innerHTML="";
+  svg.appendChild(el("rect",{x:x(band[0]),y:20,width:x(band[1])-x(band[0]),height:130,fill:"#2b8a3e",opacity:.14}));
+  svg.appendChild(el("text",{x:(x(band[0])+x(band[1]))/2,y:16,"text-anchor":"middle","font-size":12,fill:"#2b8a3e","font-weight":700},"SEAWERY 建议价 "+sym+band[0]+"–"+band[1]));
+  for(let v=0;v<=cap;v+=100){svg.appendChild(el("line",{x1:x(v),x2:x(v),y1:20,y2:150,stroke:"#e9edf5"})); svg.appendChild(el("text",{x:x(v),y:170,"text-anchor":"middle","font-size":11,fill:"#5d6b82"},sym+v+(v===cap?"+":"")));}
+  const ps=rows.map(r=>r.p).sort((a,b)=>a-b), med=ps.length?ps[Math.floor(ps.length/2)]:0;
+  svg.appendChild(el("line",{x1:x(med),x2:x(med),y1:20,y2:150,stroke:"#e8590c","stroke-dasharray":"4 3"}));
+  svg.appendChild(el("text",{x:x(med)+4,y:146,"font-size":11,fill:"#e8590c"},"全部中位数 "+sym+Math.round(med)));
+  const CC={mot:"#ff7a1a",kit:"#7c4dff",drv:"#0b5cff"};
+  rows.forEach((r,i)=>{const c=el("circle",{cx:x(r.p),cy:40+((i*37)%100),r:5.5,fill:CC[r.c]||"#868e96",opacity:.72}); c.appendChild(el("title",{},sym+r.p+" · "+r.s+" · "+r.t)); svg.appendChild(c);});
+  box.appendChild(svg);
+  const lg=document.createElement("div"); lg.className="legend"; lg.innerHTML='<span><i style="background:#ff7a1a;height:8px;width:8px;border-radius:50%"></i>电机（开环 / 闭环）</span><span><i style="background:#7c4dff;height:8px;width:8px;border-radius:50%"></i>电机 + 驱动套装</span><span><i style="background:#0b5cff;height:8px;width:8px;border-radius:50%"></i>驱动器（含 EtherCAT）</span><span>分类按商品标题自动判断，鼠标悬停看商品</span>'; box.appendChild(lg);
+}
+function drawRegion(reg){
+  const box=document.getElementById("regionChart"); box.innerHTML="";
+  const tot=Object.values(reg).reduce((a,b)=>a+b,0)||1, W=1000,H=46, svg=svgBox(W,H); let x0=0;
+  Object.entries(reg).forEach(([r,v])=>{const w=v/tot*W; if(w<=0)return; svg.appendChild(el("rect",{x:x0,y:4,width:w,height:30,fill:REG[r].c}));
+    if(w>70) svg.appendChild(el("text",{x:x0+w/2,y:24,"text-anchor":"middle","font-size":12,fill:"#fff","font-weight":700},REG[r].n.replace(/（.*/,"")+" "+Math.round(v/tot*100)+"%")); x0+=w;});
+  box.appendChild(svg);
+}
+/* ================= 来源筛选 ================= */
+function filterSrc(){
+  const rg=document.getElementById("fRegion").value, ly=document.getElementById("fLayer").value, ct=document.getElementById("fCited").checked, tx=document.getElementById("fText").value.trim().toLowerCase();
+  let n=0; document.querySelectorAll("#srcTable tbody tr").forEach(tr=>{
+    const ok=(!rg||tr.dataset.region===rg)&&(!ly||tr.dataset.layer===ly)&&(!ct||tr.dataset.cited==="1")&&(!tx||tr.textContent.toLowerCase().includes(tx));
+    tr.style.display=ok?"":"none"; if(ok)n++;});
+  document.getElementById("fCount").textContent="显示 "+n+" 条";
+}
+["fRegion","fLayer","fCited","fText"].forEach(id=>document.getElementById(id).addEventListener("input",filterSrc));
+document.querySelectorAll("a.ref").forEach(a=>a.addEventListener("click",()=>{["fRegion","fLayer","fText"].forEach(id=>document.getElementById(id).value=""); document.getElementById("fCited").checked=false; filterSrc();
+  const t=document.querySelector(a.getAttribute("href")); if(t){t.style.background="#fff7d6"; setTimeout(()=>t.style.background="",2500);}}));
+buildParams(); render(); drawTrends(); drawTrade(); drawPrice(); filterSrc();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+[
+ {
+  "id": "S1",
+  "layer": "D",
+  "country": "CN",
+  "publisher": "深圳市海布里电气有限公司（SEAWERY）",
+  "title": "《海布里 2020》产品目录（36 页，公司提供）：公司简介、混合 / 闭环步进电机、驱动器、环形变压器",
+  "url": "",
+  "via": "公司资料（人工读图）",
+  "fetched_at": "2026-11-20",
+  "published": "2020",
+  "questions": [
+   "X"
+  ],
+  "kind": "primary",
+  "path_abs": "海布里2020(1).pdf"
+ },
+ {
+  "id": "S2",
+  "layer": "D",
+  "country": "CN",
+  "publisher": "海布里品牌出海讨论会（宋丹宁、曹博、同事A）",
+  "title": "会议录音转写稿与会议纪要（2026-11-21，约 71 分钟）：出海定位改为机电一体化解决方案 + 非标定制 / 共同开发",
+  "url": "",
+  "via": "会议纪要",
+  "fetched_at": "2026-11-21",
+  "published": "2026-11-21",
+  "questions": [
+   "X"
+  ],
+  "kind": "primary",
+  "path_abs": "海布里品牌出海会议纪要_20261121.html；海布里品牌出海会议内容_20261121.docx"
+ },
+ {
+  "id": "S3",
+  "layer": "D",
+  "country": "US",
+  "publisher": "本项目：海布里 SEAWERY 美国 B2B 营销计划 v3",
+  "title": "美国单区域计划 v3（闭环步进）",
+  "url": "",
+  "via": "项目文件",
+  "fetched_at": "2026-11-20",
+  "published": "2026-11-20",
+  "questions": [
+   "X"
+  ],
+  "kind": "primary",
+  "path_abs": "海布里SEAWERY_美国B2B营销计划_v3.html"
+ },
+ {
+  "id": "S4",
+  "layer": "D",
+  "country": "CN",
+  "publisher": "本项目：海布里 SEAWERY 出海 B2B 营销计划（四区域，步进版）",
+  "title": "北美 / 欧洲 / 中东 / 东南亚四区域计划（步进版，2026-11-20）",
+  "url": "",
+  "via": "项目文件",
+  "fetched_at": "2026-11-20",
+  "published": "2026-11-20",
+  "questions": [
+   "X"
+  ],
+  "kind": "primary",
+  "path_abs": "海布里SEAWERY_出海B2B营销计划_四区域.html"
+ },
+ {
+  "id": "S5",
+  "layer": "D",
+  "country": "JP",
+  "publisher": "本项目：海布里 SEAWERY 日韩步进 B2B 营销计划",
+  "title": "日本 / 韩国计划（步进版，年度预算 $100,000，2026-11-20）",
+  "url": "",
+  "via": "项目文件",
+  "fetched_at": "2026-11-20",
+  "published": "2026-11-20",
+  "questions": [
+   "X"
+  ],
+  "kind": "primary",
+  "path_abs": "海布里SEAWERY_日韩步进B2B营销计划.html"
+ }
+]
