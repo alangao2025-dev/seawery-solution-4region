@@ -3,10 +3,9 @@ function compute(){
   const amt = {}; ITEMS.forEach(i=>amt[i.k]=0);
   if(ws>0) on.forEach(i=>amt[i.k]=S.total*(+S.w[i.k]||0)/ws);
   const P=S.p, fx=+P.fx||7.2, U=v=>v/fx, g=k=>amt[k]||0;
-  const leads = {
-    search: U(g("search"))/P.cplS, meta: U(g("meta"))/P.cplM, linkedin: U(g("linkedin"))/P.cplL,
-    community: U(g("community"))/P.cplC, show: U(g("show"))/P.cplE, partner: U(g("partner"))/P.cplP,
-    reserve: U(g("reserve"))/((P.cplS+P.cplM)/2), web: (g("web")+g("content")+g("proto"))/P.webCpl, organic: +P.organic };
+  const leads = {organic: +P.organic};
+  ITEMS.forEach(i=>{ const a=g(i.k); if(!a||i.cpl==="none") return;
+    leads[i.k] = i.cpl==="web" ? a/P.webCpl : i.cpl==="avg" ? U(a)/((P.cplS+(P.cplM||P.cplD))/2) : U(a)/P[i.cpl]; });
   const L = Object.values(leads).reduce((a,b)=>a+(isFinite(b)?b:0),0);
   const sql=L*P.sqlRate/100, samples=sql*P.sampleRate/100, wins=samples*P.winRate/100;
   const devUSD=wins*P.devFee, batchUSD=wins*P.volRate/100*P.batch, partUSD=L*P.partRate/100*P.partAov;
