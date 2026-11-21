@@ -137,17 +137,17 @@
 </div>
 
 <h3>2.2 行业：各国搜索需求</h3>
-<p class="small">Google Trends 每组 4–5 个词，只在组内比较（0–100），不是搜索次数。“brushless motor”“bldc”类词的相关搜索里有大量航模、无人机、吹风机等消费类内容（如美国的“brushless motor rc”、德国的“bldc gimbal motor”）[[SOL:S1|SOL:S3]]，所以热度只说明“有人在找”，不等于工业需求。</p>
+<p class="small">Google Trends 每组 4–5 个词，只在组内比较（0–100），不是搜索次数。“brushless motor”“bldc”类词的相关搜索里有大量航模、无人机、吹风机等消费类内容（如美国的“brushless motor rc”、德国的“bldc gimbal motor”）[[SOL:S1|SOL:S3]]，所以热度只说明“有人在找”，不等于工业需求。<b>搜索次数</b>来自 Google Ads 关键词规划师（经 Apify 查询，2026-11-21），是近 12 个月的月均次数。目前只取到美国和德国：其他国家的查询因 Apify 免费套餐当月额度用完而未完成（缺口 G5）。</p>
 <div class="tabs" id="trTabs"></div>
 <div class="chart" id="trChart"></div>
 <div class="legend" id="trLegend"></div>
 <div class="tw" style="margin-top:10px"><table>
-<tr><th>国家</th><th>无刷 / BLDC 词（近 12 个月均值，与前 12 个月比）</th><th>其他词</th><th>解读</th></tr>
-<tr><td>美国</td><td>brushless motor 30.4（+114%）；bldc motor 4.5（+88%）</td><td>robot actuator 1.7（约 6 倍）；axial flux 0.8（翻倍）；stepper motor 13.4（+15%）</td><td class="small">增长最快的都是新方向；第二组“product development”55.9（+46%）、“contract manufacturing”12.4（+94%）[[SOL:S1|SOL:S5]]，说明找开发和代工伙伴的人在变多。“custom motor”的相关词以汽车改装支架为主，不可直接用。</td></tr>
-<tr><td>德国</td><td>BLDC Motor 27.2（+37%）；bürstenloser Motor 10.3（+23%）</td><td>Axialflussmotor 3.8（从 0 起步）；Schrittmotor 45.2（−14%）</td><td class="small">无刷在涨、步进在跌[[SOL:S3]]；“Axialflussmotor”的相关词是“mercedes”，受汽车新闻带动。</td></tr>
-<tr><td>越南</td><td>động cơ không chổi than 2.4；motor bldc 0.7</td><td>động cơ bước 21.0（持平）；servo 24.3（+17%）</td><td class="small">无刷需求很小，步进 / 伺服才是主流[[SOL:S8]]——越南保留现有步进业务，不作为解决方案重点。</td></tr>
-<tr><td>泰国 / 印尼</td><td>泰 bldc 5.6（+167%）；印尼 motor bldc 5.4（+86%）、brushless 4.7（+62%）</td><td>servo 48.3 / 55.7</td><td class="small">无刷基数小但增长快[[SOL:S9|SOL:S7]]；印尼相关词有“bldc motor listrik”（电动车）、“hub motor”，与改装、电动两轮车需求有关。</td></tr>
-<tr><td>土耳其 / 阿联酋</td><td>土 fırçasız motor 14.4、bldc motor 14.1；阿 brushless motor 4.6</td><td>土 step motor 31.3、servo motor 51.9</td><td class="small">土耳其的电机搜索结构接近工业国家[[SOL:S6]]；阿联酋以“servo motor”为主、基数小[[SOL:S2]]。</td></tr>
+<tr><th>国家</th><th>无刷 / BLDC 词（Trends 近 12 个月均值，与前 12 个月比）</th><th>其他词（Trends）</th><th>月均搜索次数（Google，近 12 个月）</th><th>解读</th></tr>
+<tr><td>美国</td><td>brushless motor 30.4（+114%）；bldc motor 4.5（+88%）</td><td>robot actuator 1.7（约 6 倍）；axial flux 0.8（翻倍）；stepper motor 13.4（+15%）</td><td class="small nw"><b>servo motor 18,100</b><br><b>stepper motor 12,100</b><br>brushless motor 8,100<br>contract manufacturing 6,600<br>product development 5,400<br>bldc motor 3,600<br>axial flux motor 2,900<br>robot actuator 1,600<br>prototype manufacturing 480<br>custom motor 170<br><span class="muted">[[SOL:S30]]</span></td><td class="small">增长最快的都是新方向；第二组“product development”55.9（+46%）、“contract manufacturing”12.4（+94%）[[SOL:S1|SOL:S5]]，说明找开发和代工伙伴的人在变多。“custom motor”的相关词以汽车改装支架为主，不可直接用。<b>按次数看，</b>“stepper motor”（12,100 次 / 月）仍多于“brushless motor”（8,100），但增长慢得多；开发与代工类词的点击价格很高（“product development”$20.6、“prototype manufacturing”$47.4，而“bldc motor”$3.3）[[SOL:S30]]，搜索广告应投部件词，再用案例把人引到方案页。</td></tr>
+<tr><td>德国</td><td>BLDC Motor 27.2（+37%）；bürstenloser Motor 10.3（+23%）</td><td>Axialflussmotor 3.8（从 0 起步）；Schrittmotor 45.2（−14%）</td><td class="small nw">Servomotor 4,400<br>Axialflussmotor 3,600<br>Schrittmotor 2,900<br>BLDC Motor 1,900<br>bürstenloser Motor 1,300<br><span class="muted">[[SOL:S31]]</span></td><td class="small">无刷在涨、步进在跌[[SOL:S3]]；“Axialflussmotor”的相关词是“mercedes”，受汽车新闻带动。<b>按次数看，</b>“Axialflussmotor”每月 3,600 次，已超过“BLDC Motor”（1,900），德国是轴向磁通话题最热的市场；“Servomotor”4,400 次最多[[SOL:S31]]。</td></tr>
+<tr><td>越南</td><td>động cơ không chổi than 2.4；motor bldc 0.7</td><td>động cơ bước 21.0（持平）；servo 24.3（+17%）</td><td class="small muted">未取得（缺口 G5）</td><td class="small">无刷需求很小，步进 / 伺服才是主流[[SOL:S8]]——越南保留现有步进业务，不作为解决方案重点。</td></tr>
+<tr><td>泰国 / 印尼</td><td>泰 bldc 5.6（+167%）；印尼 motor bldc 5.4（+86%）、brushless 4.7（+62%）</td><td>servo 48.3 / 55.7</td><td class="small muted">未取得（缺口 G5）</td><td class="small">无刷基数小但增长快[[SOL:S9|SOL:S7]]；印尼相关词有“bldc motor listrik”（电动车）、“hub motor”，与改装、电动两轮车需求有关。</td></tr>
+<tr><td>土耳其 / 阿联酋</td><td>土 fırçasız motor 14.4、bldc motor 14.1；阿 brushless motor 4.6</td><td>土 step motor 31.3、servo motor 51.9</td><td class="small muted">未取得（缺口 G5）</td><td class="small">土耳其的电机搜索结构接近工业国家[[SOL:S6]]；阿联酋以“servo motor”为主、基数小[[SOL:S2]]。</td></tr>
 </table></div>
 
 <h4>图 2-2 各国电机词的搜索热度（以同组 PLC 为 1，近 12 个月）</h4>
